@@ -62,7 +62,7 @@ class CustomScaler(BaseEstimator, TransformerMixin):
         return X
 
 
-class CFSVariableReducer(BaseEstimator, TransformerMixin):
+class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
     '''Class to recursively remove features based upon the heuristic "merit"
        which is a measure of the ratio of variable correlation to the target
        vs inter-variable correlation.
