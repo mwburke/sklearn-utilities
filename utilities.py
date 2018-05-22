@@ -89,6 +89,7 @@ class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
             if self.max_features is None:
                 self.max_features = X.shape[1]
             self.remaining_variables = forward_cfs(X, Y, self.max_features)
+        return self
 
     def transform(self, X):
         return X[self.remaining_variables]
@@ -105,17 +106,15 @@ def forward_cfs(X, Y, max_features):
     while dropped:
         dropped = False
         if len(feature_set) < max_features:
-            merits = [calculate_merit(corrs, feature_set + [ix]) for ix in range(len(variables))]
+            merits = [calculate_merit(corrs, feature_set + [ix]) for ix in variables]
             if max(merits) > max_score:
                 max_score = max(merits)
+                print('Current merit score: ', str(np.round(max_score, 3)))
                 maxloc = merits.index(max(merits))
                 feature_set.append(variables[maxloc])
                 print('adding \'' + cols[variables][maxloc] + '\' at index: ' + str(maxloc))
                 del variables[maxloc]
                 dropped = True
-    print('Final merit score: ', str(np.round(max_score, 3)))
-    print('Remaining variables:')
-    print(cols[feature_set])
     return cols[feature_set]
 
 
