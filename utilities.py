@@ -77,18 +77,19 @@ class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
        Inspired by: https://www.cs.waikato.ac.nz/~mhall/thesis.pdf
     '''
 
-    def __init__(self, direction='forward', min_features=1, max_features=None):
+    def __init__(self, direction='forward', feature_limit=None):
         self.direction = direction
-        self.min_features = min_features
-        self.max_features = max_features
+        self.feature_limit = feature_limit
 
     def fit(self, X, Y):
         if self.direction == 'backward':
-            self.remaining_variables = backward_cfs(X, Y, self.min_features)
+            if self.feature_limit is None:
+                self.feature_limit = 1
+            self.remaining_variables = backward_cfs(X, Y, self.feature_limit)
         elif self.direction == 'forward':
-            if self.max_features is None:
-                self.max_features = X.shape[1]
-            self.remaining_variables = forward_cfs(X, Y, self.max_features)
+            if self.feature_limit is None:
+                self.feature_limit = X.shape[1]
+            self.remaining_variables = forward_cfs(X, Y, self.feature_limit)
         return self
 
     def transform(self, X):
@@ -162,7 +163,7 @@ class VIFVariableReducer(BaseEstimator, TransformerMixin):
         self.threshold = threshold
 
     def fit(self, X):
-        self.remaining_variables = calculate_vif_cols(X, self.threshold, self.num_cores)
+        self.remaining_variables = calculate_vif_cols(X, self.threshold)
         return self
 
     def transform(self, X):
