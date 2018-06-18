@@ -186,3 +186,59 @@ def calculate_vif_cols(X, thresh):
     print('Remaining variables:')
     print(cols[variables])
     return cols[variables]
+
+
+class IQROutlierRemover(BaseEstimator, TransformerMixin):
+    '''Remove outliers from the dataset using the
+       interquartile range (IQR) method:
+
+       For each column:
+        Q1 = 25% quartile
+        Q3 = 75% quartile
+        Calculate the IQR = Q3 - Q1
+        Set min = Q1 - (IQR x multiplier)
+        Set max = Q3 + (IQR x multiplier)
+        Remove rows with points above min/max
+
+       Params:
+        multiplier: IQR multiplier
+        minmax: takes in 'min', 'max', or 'both' to determine
+                which sides to limit data on
+        replace: boolean field whether to replace outliers
+                 with NaNs or to drop rows with outlier values
+    '''
+
+    def __init__(self, multiplier=1.5, minmax='both', replace=False):
+        self.multiplier = multiplier
+        self.minmax = minmax
+        self.replace = replace
+
+    def fit(self, X):
+        # calculate the outliers here and store in matrix
+        self.outliers = X.apply(detect_outliers, axis=0, multiplier=self.multiplier, minmax=self.minmax)
+        return self
+
+    def transform(self, X):
+        if self.replace:
+            for c in X.columns:
+                X[c][self.outliers[c]] = np.nan
+        else:
+            X = X.drop(X.index[self.outliers.apply(sum, axis=1) > 0])
+        return X
+
+
+def detect_outliers(arr, multiplier, minmax):
+    q1, q3 = np.nanpercentile(arr, [25, 75])
+    iqr = q3 - q1
+    arr_min = q1 - iqr * multiplier
+    arr_max = q3 + iqr * multiplier
+
+    outlier_min = np.array([False] * len(arr))
+    outlier_max = np.array([False] * len(arr))
+
+    if (minmax == 'min') | (minmax == 'both'):
+        outlier_min = arr < arr_min
+    if (minmax == 'max') | (minmax == 'both'):
+        outlier_max = arr > arr_max
+
+    return outlier_min | outlier_max

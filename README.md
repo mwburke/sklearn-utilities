@@ -18,3 +18,5 @@ Most have dependencies and could do with a bit of optimization.
 Machine Learning](https://www.cs.waikato.ac.nz/~mhall/thesis.pdf)
 
 `VIFVariableReducer`: recursively drops features with the lowest VIF (variance inflation factor) until the scores fall below an initialized threshold
+
+`IQROutlierRemover`: identifies outliers based on the internal quartile range (IQR) and allows the user to either remove rows with outliers or replace outliers with null values. More details are in the function comment
