@@ -242,3 +242,26 @@ def detect_outliers(arr, multiplier, minmax):
         outlier_max = arr > arr_max
 
     return outlier_min | outlier_max
+
+
+class ClassMaxLimiter(BaseEstimator, TransformerMixin):
+    '''Limit the number of values in the dataset for particular classes
+       to a specified number by downsampling categories that have more
+       entries than the limit.
+    '''
+
+    def __init__(self, columns, limit):
+        self.columns = columns
+        self.limit = limit
+
+    def fit(self, X):
+        return self
+
+    def transform(self, X):
+        return X.groupby([self.columns]).apply(limit_class, limit=self.limit)
+
+
+def limit_class(df, limit):
+    if df.shape[0] > limit:
+        return df.sample(n=limit)
+    return df
