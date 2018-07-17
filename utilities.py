@@ -62,6 +62,23 @@ class CustomScaler(BaseEstimator, TransformerMixin):
         return X
 
 
+class CustomImputer(BaseEstimator, TransformerMixin):
+    '''Custom imputer class to allow the user to define a dictionary
+       of columns and the values to impute.
+    '''
+
+    def __init__(self, imp_dict):
+        self.imp_dict = imp_dict
+
+    def fit(self, X):
+        return self
+
+    def transform(self, X):
+        for col in self.imp_dict.keys():
+            X[col].fillna(self.imp_dict[col], inplace=True)
+        return X
+
+
 class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
     '''Class to recursively remove features based upon the heuristic "merit"
        which is a measure of the ratio of variable correlation to the target
