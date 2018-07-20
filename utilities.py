@@ -61,6 +61,14 @@ class CustomScaler(BaseEstimator, TransformerMixin):
         X[self.continuous_cols] = self.scaler.transform(X[self.continuous_cols])
         return X
 
+    @property
+    def means_(self):
+        return self.scaler.means_
+
+    @property
+    def scales_(self):
+        return self.scaler.scales_
+
 
 class CustomImputer(BaseEstimator, TransformerMixin):
     '''Custom imputer class to allow the user to define a dictionary
@@ -77,6 +85,10 @@ class CustomImputer(BaseEstimator, TransformerMixin):
         for col in self.imp_dict.keys():
             X[col].fillna(self.imp_dict[col], inplace=True)
         return X
+
+    @property
+    def statistics_(self):
+        return list(self.imp_dict.values())
 
 
 class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
