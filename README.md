@@ -14,6 +14,8 @@ Most have dependencies and could do with a bit of optimization.
 
 `CustomScaler`: wrapper around `scikit-learn`'s `StandardScaler` but with the option to omit fields from the scaling (such as binary integer fields)
 
+`PercentileScaler`: similar to `scikit-learn`'s `StandardScaler` but specify the upper and lower percentiles to use as the max/min values with which to scaler for each column rather than using the min/max.
+
 `CustomImputer`: allows the user to specify a dictionary of columns and their associated imputation values, replaes all NA values with the imputation values
 
 `CorrelationFeatureSelector`: selects features recursively in a forward or backward manner based on the ratio of feature-target correlation to a mean within-feature correlation heuristic. Based off of this paper (chapter 4): [Correlation-based Feature Selection for

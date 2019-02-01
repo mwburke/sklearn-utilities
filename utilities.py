@@ -7,9 +7,10 @@ import pandas as pd
 
 
 class ThresholdColDropper(BaseEstimator, TransformerMixin):
-    '''Custom class to automatically drop any fields that have
-       more null values than the threshold the class is initialized with.
-    '''
+    """
+    Custom class to automatically drop any fields that have
+    more null values than the threshold the class is initialized with.
+    """
 
     def __init__(self, threshold):
         self.threshold = threshold
@@ -24,11 +25,12 @@ class ThresholdColDropper(BaseEstimator, TransformerMixin):
 
 
 class KNNImputer(BaseEstimator, TransformerMixin):
-    '''Custom imputer class to integrate fancyimputer's KNN imputer
-       into the sklearn Pipeline functionality as a transformer.
-       Initialized with the number of closes neighbors to compare to.
-       Input is pandas dataframe and returns pandas dataframe.
-    '''
+    """
+    Custom imputer class to integrate fancyimputer's KNN imputer
+    into the sklearn Pipeline functionality as a transformer.
+    Initialized with the number of closes neighbors to compare to.
+    Input is pandas dataframe and returns pandas dataframe.
+    """
 
     def __init__(self, k):
         self.k = k
@@ -44,9 +46,10 @@ class KNNImputer(BaseEstimator, TransformerMixin):
 
 
 class CustomScaler(BaseEstimator, TransformerMixin):
-    '''Custom scaler class to only apply the standardscaler to
-       columns that are not in the initialized variable cat_cols.
-    '''
+    """
+    Custom scaler class to only apply the standardscaler to
+    columns that are not in the initialized variable cat_cols.
+    """
 
     def __init__(self, cat_cols):
         self.cat_cols = cat_cols
@@ -71,9 +74,10 @@ class CustomScaler(BaseEstimator, TransformerMixin):
 
 
 class CustomImputer(BaseEstimator, TransformerMixin):
-    '''Custom imputer class to allow the user to define a dictionary
-       of columns and the values to impute.
-    '''
+    """"
+    Custom imputer class to allow the user to define a dictionary
+    of columns and the values to impute.
+    """
 
     def __init__(self, imp_dict):
         self.imp_dict = imp_dict
@@ -92,19 +96,20 @@ class CustomImputer(BaseEstimator, TransformerMixin):
 
 
 class CorrelationFeatureSelector(BaseEstimator, TransformerMixin):
-    '''Class to recursively remove features based upon the heuristic "merit"
-       which is a measure of the ratio of variable correlation to the target
-       vs inter-variable correlation.
+    """
+    Class to recursively remove features based upon the heuristic "merit"
+    which is a measure of the ratio of variable correlation to the target
+    vs inter-variable correlation.
 
-       For backward direction, it emoves features recursively until the
-       merit score no longer increases. Returns dataframe with only the
-       columns left in the subset.
+    For backward direction, it emoves features recursively until the
+    merit score no longer increases. Returns dataframe with only the
+    columns left in the subset.
 
-       For forward direction, it adds features recursively, keeping the
-       best scoring set of features until the merit score stops increasing.
+    For forward direction, it adds features recursively, keeping the
+    best scoring set of features until the merit score stops increasing.
 
-       Inspired by: https://www.cs.waikato.ac.nz/~mhall/thesis.pdf
-    '''
+    Inspired by: https://www.cs.waikato.ac.nz/~mhall/thesis.pdf
+    """
 
     def __init__(self, direction='forward', feature_limit=None):
         self.direction = direction
@@ -158,7 +163,7 @@ def backward_cfs(X, Y, min_features):
     while dropped:
         dropped = False
         if len(variables) > min_features:
-            merits = [calculate_merit_exclude(corrs[:,variables], ix) for ix in range(corrs[:,variables].shape[1])]
+            merits = [calculate_merit_exclude(corrs[:, variables], ix) for ix in range(corrs[:, variables].shape[1])]
             if max(merits) > max_score:
                 max_score = max(merits)
                 minloc = merits.index(min(merits))
@@ -183,10 +188,11 @@ def calculate_merit(X, variables):
 
 
 class VIFVariableReducer(BaseEstimator, TransformerMixin):
-    '''Class to recursively remove features based upon VIF values
-       above a certain threshold. Returns the reduced dataframe with
-       only the remaining variables.
-    '''
+    """
+    Class to recursively remove features based upon VIF values
+    above a certain threshold. Returns the reduced dataframe with
+    only the remaining variables.
+    """
 
     def __init__(self, threshold=5.0):
         self.threshold = threshold
@@ -206,7 +212,7 @@ def calculate_vif_cols(X, thresh):
     dropped = True
     while dropped:
         dropped = False
-        vif = [variance_inflation_factor(X[:,variables], ix) for ix in range(X[:,variables].shape[1])]
+        vif = [variance_inflation_factor(X[:, variables], ix) for ix in range(X[:, variables].shape[1])]
         if max(vif) > thresh:
             maxloc = vif.index(max(vif))
             print('dropping \'' + cols[variables][maxloc] + '\' at index: ' + str(maxloc))
@@ -218,10 +224,11 @@ def calculate_vif_cols(X, thresh):
 
 
 class IQROutlierRemover(BaseEstimator, TransformerMixin):
-    '''Remove outliers from the dataset using the
+    """
+    Remove outliers from the dataset using the
        interquartile range (IQR) method:
 
-       For each column:
+    For each column:
         Q1 = 25% quartile
         Q3 = 75% quartile
         Calculate the IQR = Q3 - Q1
@@ -229,13 +236,13 @@ class IQROutlierRemover(BaseEstimator, TransformerMixin):
         Set max = Q3 + (IQR x multiplier)
         Remove rows with points above min/max
 
-       Params:
+    Params:
         multiplier: IQR multiplier
         minmax: takes in 'min', 'max', or 'both' to determine
                 which sides to limit data on
         replace: boolean field whether to replace outliers
                  with NaNs or to drop rows with outlier values
-    '''
+    """
 
     def __init__(self, multiplier=1.5, minmax='both', replace=False):
         self.multiplier = multiplier
@@ -274,10 +281,11 @@ def detect_outliers(arr, multiplier, minmax):
 
 
 class ClassMaxLimiter(BaseEstimator, TransformerMixin):
-    '''Limit the number of values in the dataset for particular classes
-       to a specified number by downsampling categories that have more
-       entries than the limit.
-    '''
+    """
+    Limit the number of values in the dataset for particular classes
+    to a specified number by downsampling categories that have more
+    entries than the limit.
+    """
 
     def __init__(self, columns, limit):
         self.columns = columns
@@ -294,3 +302,26 @@ def limit_class(df, limit):
     if df.shape[0] > limit:
         return df.sample(n=limit)
     return df
+
+
+class PercentileScaler(BaseEstimator, TransformerMixin):
+    """
+    Scaler similar to sklearn's StandardScaler, but instead of
+    scaling values from the maximum and minimum values, it scales
+    values from the input upper and lower percentile bounds.
+    """
+
+    def __init__(self, lower=5, upper=95):
+        self.lower = lower
+        self.upper = upper
+
+    def fit(self, X):
+        return self
+
+    def transform(self, X):
+        return X.apply(lambda x: self.scale(x))
+
+    def scale(self, X):
+        lower = np.percentile(X, self.lower)
+        upper = np.percentile(X, self.upper)
+        return (X - lower) / (upper - lower)
